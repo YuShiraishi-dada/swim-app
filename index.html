@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>SwimMenu - 水泳メニュー自動生成</title>
+    <meta name="description" content="強度・距離・狙いを選ぶだけで水泳の練習メニューを自動生成。PDF保存・X投稿・お気に入り保存に対応。" />
+    <meta name="theme-color" content="#0f2433" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">SwimMenu</span>
+        <span class="brand-sub">水泳メニュー自動生成</span>
+      </div>
+      <nav class="tabs" role="tablist">
+        <button role="tab" data-tab="gen" aria-selected="true">作成</button>
+        <button role="tab" data-tab="fav" aria-selected="false">お気に入り <span id="fav-count" class="badge"></span></button>
+      </nav>
+    </header>
+
+    <main>
+      <section id="tab-gen" class="tab-panel">
+        <form id="params" class="card form" novalidate>
+          <p class="form-note"><span class="tag req">必須</span> 入力が必要　<span class="tag opt">任意</span> 省略できます</p>
+
+          <fieldset>
+            <legend>メインの狙い <span class="tag req">必須</span></legend>
+            <div class="seg seg-focus" data-name="focus">
+              <button type="button" data-value="sprint">スプリント</button>
+              <button type="button" data-value="lactate">対乳酸</button>
+              <button type="button" data-value="endurance">エンデュランス</button>
+              <button type="button" data-value="recovery">アクティブレスト</button>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>強度 <span class="tag req">必須</span> <span class="hint" id="intensity-label"></span></legend>
+            <div class="seg" data-name="intensity">
+              <button type="button" data-value="1">1</button>
+              <button type="button" data-value="2">2</button>
+              <button type="button" data-value="3">3</button>
+              <button type="button" data-value="4">4</button>
+              <button type="button" data-value="5">5</button>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>距離の目安 <span class="tag req">必須</span> <output id="distance-out" class="value"></output></legend>
+            <input type="range" id="distance" min="1000" max="6000" step="100" />
+            <div class="range-scale"><span>1000</span><span>3500</span><span>6000m</span></div>
+          </fieldset>
+
+          <fieldset id="field-cycle">
+            <legend><label for="baseCycle">EN2 で回している 100m のサイクル</label> <span class="tag req">必須</span></legend>
+            <div class="cycle-row">
+              <select id="baseCycle" required aria-describedby="cycle-help cycle-error"></select>
+              <span class="cycle-pace" id="cycle-pace"></span>
+            </div>
+            <p class="help" id="cycle-help">普段のエンデュランス練習（EN2）で、クロール 100m を回しているサイクル。メニューのサイクルはすべてこれを基準に計算します。</p>
+            <p class="error" id="cycle-error" hidden>サイクルを選んでください</p>
+          </fieldset>
+
+          <div class="optional">
+            <div class="grid2">
+              <label class="span2">
+                <span class="lbl">練習時間 <span class="tag opt">任意</span></span>
+                <select id="minutes"></select>
+                <span class="help">指定すると、この時間に収まるように距離を自動で調整します</span>
+              </label>
+              <label>
+                <span class="lbl">プール <span class="tag opt">任意</span></span>
+                <select id="pool">
+                  <option value="25">25m</option>
+                  <option value="50">50m</option>
+                </select>
+              </label>
+              <label>
+                <span class="lbl">泳法 <span class="tag opt">任意</span></span>
+                <select id="strokeMode">
+                  <option value="fr">クロール中心</option>
+                  <option value="mixed">4 泳法ミックス</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn primary big">メニューを作成</button>
+        </form>
+
+        <div id="result"></div>
+      </section>
+
+      <section id="tab-fav" class="tab-panel" hidden>
+        <div class="card">
+          <div class="fav-head">
+            <h2>お気に入り</h2>
+            <div class="fav-tools">
+              <button type="button" class="btn small" id="fav-export">書き出し</button>
+              <label class="btn small">読み込み<input type="file" id="fav-import" accept="application/json" hidden /></label>
+            </div>
+          </div>
+          <p class="muted small-text">お気に入りはこの端末のブラウザ内に保存されます。機種変更時は「書き出し」でバックアップしてください。</p>
+          <ul id="fav-list" class="fav-list"></ul>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
